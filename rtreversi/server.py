@@ -6,6 +6,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import os
+import json
 
 
 class WTReversiApp(tornado.web.Application):
@@ -35,13 +36,18 @@ class ReversiHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print 'open connection'
+        j = {
+            'command': 'init',
+            'param': 'initialize'
+        }
+        self.write_message(json.dumps(j))
 
     def on_close(self):
         print 'close connection'
         self.application.manager.delete(self)
 
     def on_message(self, msg):
-        pass
+        print msg
 
 
 def main():
