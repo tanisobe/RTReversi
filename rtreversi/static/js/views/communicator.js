@@ -27,6 +27,11 @@ RTReversi.Views.Communicator = Backbone.View.extend({
     onMessage: function (evt) {
         msg = JSON.parse(evt.data);
         console.log(msg);
+        switch (msg.command){
+            case 'updateGame':
+            RTReversi.EventDispatcher.trigger('renderReversi', msg.param.board);
+            RTReversi.EventDispatcher.trigger('renderPlayerStatus', msg.param.players);
+            break;
+        }
     }
-
 });

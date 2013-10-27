@@ -5,7 +5,8 @@ RTReversi.Views.Reversi = Backbone.View.extend({
     },
 
     initialize: function () {
-        RTReversi.EventDispatcher.on('render-reversi', this.render);
+        _.bindAll(this, 'render', 'renderBoard', 'renderDisc', 'renderDiscs', 'initialize');
+        RTReversi.EventDispatcher.on('renderReversi', this.render);
         var that = this;
         this.$el[0].addEventListener('mousemove',function(evt) {
             var rect = this.getBoundingClientRect();
@@ -15,10 +16,11 @@ RTReversi.Views.Reversi = Backbone.View.extend({
             });
         });
         this.ctx = this.$el[0].getContext('2d');
-        this.render();
     },
 
     renderBoard: function () {
+        this.ctx.clearRect(0, 0, this.$el[0].width, this.$el[0].height);
+        this.ctx.beginPath();
         for ( var i = 0; i < this.model.get('size') ; i++) {
             for ( var j = 0; j < this.model.get('size') ; j++) {
                 this.ctx.rect(
@@ -34,11 +36,36 @@ RTReversi.Views.Reversi = Backbone.View.extend({
         this.ctx.closePath();
     },
 
-    renderDisc: function () {
+    renderDisc: function (x, y, color) {
+        if ( color ){
+            this.ctx.fillStyle = color;
+            this.ctx.beginPath();
+            this.ctx.arc(
+                this.model.get('x') + this.model.get('tileLength') * (x + 0.5),
+                this.model.get('y') + this.model.get('tileLength') * (y + 0.5),
+                (this.model.get('tileLength')-10) / 2,
+                0, 2 * Math.PI, false
+            );
+            this.ctx.fill();
+            this.ctx.stroke();
+            this.ctx.closePath();
+        }
     },
 
-    render: function () {
+    renderDiscs: function (param) {
+        console.log('rederDiscs');
+        console.log(param)
+        for ( var x = 0; x < this.model.get('size'); x++){
+            for ( var y = 0; y < this.model.get('size'); y++){
+                this.renderDisc(x, y, param[x][y]);
+            }
+        }
+    },
+
+    render: function (param) {
+        console.log(param);
         this.renderBoard();
+        this.renderDiscs(param.surface);
     },
 
     getBoardPos: function () {
