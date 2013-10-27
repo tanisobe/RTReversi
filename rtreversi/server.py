@@ -37,8 +37,8 @@ class ReversiHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         print 'open connection'
         j = {
-            'command': 'init',
-            'param': 'initialize'
+            'command': 'updateGame',
+            'param': json.loads(self.game.toJson())
         }
         self.write_message(json.dumps(j))
 
@@ -54,11 +54,14 @@ class ReversiHandler(tornado.websocket.WebSocketHandler):
             method = getattr(self.player, m['command'])
             if method is not None:
                 if method(**m['param']):
-                    j = {
-                        'command': 'updateGame',
-                        'param': json.loads(self.game.toJson())
-                    }
-                    self.write_message(json.dumps(j))
+                    self.game.update()
+
+    def updateGame(self):
+        j = {
+            'command': 'updateGame',
+            'param': json.loads(self.game.toJson())
+        }
+        self.write_message(json.dumps(j))
 
 
 def main():

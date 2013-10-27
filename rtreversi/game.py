@@ -14,6 +14,7 @@ class Game():
         self.__board = Board()
         self.__max_player = max_player
         self.__lock = threading.Lock()
+        self.DISC_COLORS = ['Black', 'White', 'Red', 'Blue', 'Yellow']
         self.wait = True
 
     @property
@@ -34,7 +35,7 @@ class Game():
 
     def accept(self, handler):
         with self.__lock:
-            p = Player('test', 'Black', Disc(), self.__board)
+            p = Player('test', self.DISC_COLORS[len(self.__players)], Disc(), self.__board)
             self.__players[handler] = p
             if len(self.__players) == self.__max_player:
                 self.wait = False
@@ -54,6 +55,10 @@ class Game():
                 for player in self.__players:
                     if not player.ready:
                         return
+
+    def update(self):
+        for handler in self.__players.keys():
+            handler.updateGame()
 
 
 class GameManager():
