@@ -9,7 +9,7 @@ import os
 import json
 
 
-class WTReversiApp(tornado.web.Application):
+class RTReversiApp(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
@@ -32,7 +32,7 @@ class MainHandler(tornado.web.RequestHandler):
 class ReversiHandler(tornado.websocket.WebSocketHandler):
     def initialize(self):
         print 'initialize'
-        self.player = self.application.manager.introduce(self)
+        (self.player, self.game) = self.application.manager.introduce(self)
 
     def open(self):
         print 'open connection'
@@ -48,10 +48,21 @@ class ReversiHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, msg):
         print msg
+        m = json.loads(msg)
+        commands = ['putDisc', 'removeDisc']
+        if m['command'] in commands:
+            method = getattr(self.player, m['command'])
+            if method is not None:
+                if method(**m['param']):
+                    j = {
+                        'command': 'updateGame',
+                        'param': json.loads(self.game.toJson())
+                    }
+                    self.write_message(json.dumps(j))
 
 
 def main():
-    app = WTReversiApp()
+    app = RTReversiApp()
     app.listen(5000)
     tornado.ioloop.IOLoop.instance().start()
 

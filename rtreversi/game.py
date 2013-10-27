@@ -2,6 +2,7 @@
 # -*- coding=utf-8 -*-
 
 import threading
+import json
 from rtreversi.reversi import Player
 from rtreversi.reversi import Board
 from rtreversi.reversi import Disc
@@ -20,15 +21,24 @@ class Game():
         with self.__lock:
             return len(self.__players)
 
+    def toJson(self):
+        pjson = []
+        for player in self.__players.values():
+            pjson.append(json.loads(player.toJson()))
+        bjson = self.__board.toJson()
+        j = {
+            'players': pjson,
+            'board': json.loads(bjson)
+        }
+        return json.dumps(j)
+
     def accept(self, handler):
         with self.__lock:
-            if self.wait:
-                p = Player('test', 'Black', Disc(), self.__board)
-                self.__players[handler] = p
-                if len(self.__players) == self.__max_player:
-                    self.wait = False
-                return p
-            return None
+            p = Player('test', 'Black', Disc(), self.__board)
+            self.__players[handler] = p
+            if len(self.__players) == self.__max_player:
+                self.wait = False
+            return p
 
     def refuse(self, handler):
         with self.__lock:
@@ -56,13 +66,13 @@ class GameManager():
         player = game.accept(handler)
         with self.__lock:
             self.games.append(game)
-            return player
+            return (player, game)
 
     def introduce(self, handler):
         with self.__lock:
             for game in self.games:
                 if game.wait:
-                    return game.accept(handler)
+                    return (game.accept(handler), game)
             return self.create(handler)
 
     def oust(self, handler):

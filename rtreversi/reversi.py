@@ -2,6 +2,7 @@
 # -*- coding=utf-8 -*-
 
 import threading
+import json
 from rtreversi.error import BoardError
 
 
@@ -57,6 +58,14 @@ class Board:
             return True
         except IndexError:
             return False
+
+    def toJson(self):
+        with self.__lock:
+            j = {
+                'surface': self.__surface,
+                'disc': self.__disc
+            }
+            return json.dumps(j)
 
     def __eval(self, x, y, color):
         vectors = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
@@ -119,16 +128,28 @@ class Player:
     def name(self):
         return self.__name
 
+    def toJson(self):
+        j = {
+            'name': self.__name,
+            'disc': self.__disc.count,
+            'color': self.color
+        }
+        return json.dumps(j)
+
     def putDisc(self, x, y):
         if self.__disc.reduce(1):
             try:
                 self.__board.set(x, y, self.color)
+                return True
             except BoardError:
                 self.__disc.increase(1)
+                return False
 
     def removeDisc(self, x, y):
         if self.__disc.reduce(5):
             try:
                 self.__board.remove(x, y)
+                return True
             except BoardError:
                 self.__disc.increase(5)
+                return False
