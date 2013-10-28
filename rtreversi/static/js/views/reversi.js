@@ -5,7 +5,7 @@ RTReversi.Views.Reversi = Backbone.View.extend({
     },
 
     initialize: function () {
-        _.bindAll(this, 'render', 'renderBoard', 'renderDisc', 'renderDiscs', 'initialize');
+        _.bindAll(this, 'render', 'renderBoard', 'renderDisc', 'renderDiscs', 'renderBoardStatus', 'initialize');
         RTReversi.EventDispatcher.on('renderReversi', this.render);
         var that = this;
         this.$el[0].addEventListener('mousemove',function(evt) {
@@ -53,8 +53,6 @@ RTReversi.Views.Reversi = Backbone.View.extend({
     },
 
     renderDiscs: function (param) {
-        console.log('rederDiscs');
-        console.log(param)
         for ( var x = 0; x < this.model.get('size'); x++){
             for ( var y = 0; y < this.model.get('size'); y++){
                 this.renderDisc(x, y, param[x][y]);
@@ -62,10 +60,24 @@ RTReversi.Views.Reversi = Backbone.View.extend({
         }
     },
 
+    renderBoardStatus: function (param) {
+        var i = 1;
+        var size = ( parseInt(this.$el[0].width) - 20 ) / ( Object.keys(param).length + 1 );
+        var ctx = this.$el[0].getContext('2d');
+        $.each( param, function( color, count ) {
+            if ( color != 'null') {
+                ctx.font = '30px Arial';
+                ctx.fillStyle = 'black';
+                ctx.fillText( color + ' : ' + count, size * i, 50);
+                i++;
+            }
+        });
+    },
+
     render: function (param) {
-        console.log(param);
         this.renderBoard();
         this.renderDiscs(param.surface);
+        this.renderBoardStatus(param.disc);
     },
 
     getBoardPos: function () {

@@ -6,7 +6,7 @@ RTReversi.App = Backbone.View.extend({
 
         this.reversi = new RTReversi.Views.Reversi({
             el: '#game',
-            model: new RTReversi.Models.Reversi({x: 8, y: 8, size: 8, tileLength: 60})
+            model: new RTReversi.Models.Reversi({x: 50, y: 100, size: 8, tileLength: 60})
         });
 
         this.status = new RTReversi.Views.Status({

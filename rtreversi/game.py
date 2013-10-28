@@ -9,7 +9,7 @@ from rtreversi.reversi import Disc
 
 
 class Game():
-    def __init__(self, max_player=2):
+    def __init__(self, max_player=4):
         self.__players = dict()
         self.__board = Board()
         self.__max_player = max_player
