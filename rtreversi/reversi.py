@@ -114,10 +114,11 @@ class Disc:
 
 
 class Player:
-    def __init__(self, name, color, disc, board):
-        self.__name = name
+    def __init__(self, id, color, disc, board):
+        self.__id = id
         self.__disc = disc
         self.__board = board
+        self.__ready = False
         self.color = color
 
     def initialize(self, disc, board):
@@ -125,13 +126,14 @@ class Player:
         self.__board = board
 
     @property
-    def name(self):
-        return self.__name
+    def id(self):
+        return self.__id
 
     def toJson(self):
         j = {
-            'name': self.__name,
+            'id': self.__id,
             'disc': self.__disc.count,
+            'ready': self.__ready,
             'color': self.color
         }
         return json.dumps(j)

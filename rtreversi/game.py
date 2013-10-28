@@ -35,7 +35,7 @@ class Game():
 
     def accept(self, handler):
         with self.__lock:
-            p = Player('test', self.DISC_COLORS[len(self.__players)], Disc(), self.__board)
+            p = Player(len(self.__players), self.DISC_COLORS[len(self.__players)], Disc(), self.__board)
             self.__players[handler] = p
             if len(self.__players) == self.__max_player:
                 self.wait = False
