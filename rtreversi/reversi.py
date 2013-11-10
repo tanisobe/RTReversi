@@ -2,16 +2,22 @@
 # -*- coding=utf-8 -*-
 
 import threading
+import random
 import json
 from rtreversi.error import BoardError
 
 
 class Board:
     def __init__(self, x_size=10, y_size=10):
+        self.initialize(x_size, y_size)
+        self.__lock = threading.Lock()
+
+    def initialize(self, x_size, y_size):
         self.__surface = [[None for x in range(x_size)] for y in range(y_size)]
+        for i in range(1, int(x_size * y_size * 0.05)):
+            self.__surface[random.randint(0, x_size - 1)][random.randint(0, y_size - 1)] = 'Obstacle'
         self.__disc = {None: x_size * y_size}
         self.__size = x_size * y_size
-        self.__lock = threading.Lock()
 
     def surface(self, x, y):
         with self.__lock:
@@ -42,7 +48,7 @@ class Board:
     def remove(self, x, y):
         with self.__lock:
             if self.onBoard(x, y):
-                if self.__surface[x][y] is not None:
+                if self.__surface[x][y] not in [None, 'Obstacle']:
                     self.__disc[self.__surface[x][y]] -= 1
                     self.__disc[None] += 1
                     self.__surface[x][y] = None
@@ -75,7 +81,7 @@ class Board:
             capture_pos = []
             (posX, posY) = plus(x, y, vec)
             while self.onBoard(posX, posY):
-                if self.__surface[posX][posY] is None:
+                if self.__surface[posX][posY] in [None, 'Obstacle']:
                     break
                 elif self.__surface[posX][posY] == color:
                     for cp in capture_pos:

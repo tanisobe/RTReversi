@@ -19,36 +19,57 @@ RTReversi.Views.Reversi = Backbone.View.extend({
     },
 
     renderBoard: function () {
-        this.ctx.clearRect(0, 0, this.$el[0].width, this.$el[0].height);
-        this.ctx.beginPath();
+        var ctx = this.$el[0].getContext('2d');
+        ctx.clearRect(0, 0, this.$el[0].width, this.$el[0].height);
+        ctx.beginPath();
         for ( var i = 0; i < this.model.get('size') ; i++) {
             for ( var j = 0; j < this.model.get('size') ; j++) {
-                this.ctx.rect(
+                ctx.rect(
                     this.model.get('x') + i * this.model.get('tileLength'),
                     this.model.get('y') + j * this.model.get('tileLength'),
                     this.model.get('tileLength'),
                     this.model.get('tileLength')
                 );
-                this.ctx.lineWidth = 3;
-                this.ctx.stroke();
+                ctx.lineWidth = 3;
+                ctx.stroke();
             }
         }
-        this.ctx.closePath();
+        ctx.closePath();
+    },
+
+    renderObstacle: function (x, y) {
+        console.log(x, y);
+        var ctx = this.$el[0].getContext('2d');
+        ctx.beginPath();
+        ctx.fillStyle = 'Black';
+        ctx.fillRect(
+            this.model.get('x') + x * this.model.get('tileLength'),
+            this.model.get('y') + y * this.model.get('tileLength'),
+            this.model.get('tileLength'),
+            this.model.get('tileLength')
+        );
+        ctx.stroke();
+        ctx.closePath();
     },
 
     renderDisc: function (x, y, color) {
         if ( color ){
-            this.ctx.fillStyle = color;
-            this.ctx.beginPath();
-            this.ctx.arc(
-                this.model.get('x') + this.model.get('tileLength') * (x + 0.5),
-                this.model.get('y') + this.model.get('tileLength') * (y + 0.5),
-                (this.model.get('tileLength')-10) / 2,
-                0, 2 * Math.PI, false
-            );
-            this.ctx.fill();
-            this.ctx.stroke();
-            this.ctx.closePath();
+            if (color == 'Obstacle'){
+                this.renderObstacle(x, y);
+            }else{
+                var ctx = this.$el[0].getContext('2d');
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(
+                    this.model.get('x') + this.model.get('tileLength') * (x + 0.5),
+                    this.model.get('y') + this.model.get('tileLength') * (y + 0.5),
+                    (this.model.get('tileLength')-10) / 2,
+                    0, 2 * Math.PI, false
+                );
+                ctx.fill();
+                ctx.stroke();
+                ctx.closePath();
+            }
         }
     },
 
