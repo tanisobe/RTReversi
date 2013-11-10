@@ -44,7 +44,7 @@ class Game():
             return p
 
     def delete(self, handler):
-        if not self.wait:
+        if not self.wait and self.__timer is not None:
             self.__timer.stop()
 
         with self.__lock:
@@ -77,7 +77,7 @@ class Game():
         return False
 
     def isFull(self):
-        if len(self.__players) >= self.__max_player:
+        if len(self.__players) > self.__max_player:
             return True
         return False
 

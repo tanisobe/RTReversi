@@ -7,7 +7,7 @@ from rtreversi.error import BoardError
 
 
 class Board:
-    def __init__(self, x_size=8, y_size=8):
+    def __init__(self, x_size=10, y_size=10):
         self.__surface = [[None for x in range(x_size)] for y in range(y_size)]
         self.__disc = {None: x_size * y_size}
         self.__size = x_size * y_size

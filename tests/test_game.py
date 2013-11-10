@@ -16,9 +16,9 @@ class TestGame(unittest.TestCase):
         self.game.accept(self.handler)
         self.assertEqual(self.game.playerCount, 1)
 
-    def test_refuse(self):
+    def test_delete(self):
         self.game.accept(self.handler)
-        self.game.refuse(self.handler)
+        self.game.delete(self.handler)
         self.assertEqual(self.game.playerCount, 0)
 
 
@@ -37,11 +37,11 @@ class TestCameManager(unittest.TestCase):
         self.gm.introduce(self.handler3)
         self.assertEqual(len(self.gm.games), 2)
 
-    def test_oust(self):
+    def test_deleteHandler(self):
         self.gm.introduce(self.handler1)
         self.gm.introduce(self.handler2)
         self.gm.introduce(self.handler3)
-        self.gm.oust(self.handler1)
+        self.gm.deleteHandler(self.handler1)
         self.assertEqual(self.gm.games[0].playerCount, 1)
         self.gm.introduce(self.handler1)
         self.assertEqual(self.gm.games[0].playerCount, 2)

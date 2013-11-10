@@ -10,7 +10,7 @@ from rtreversi.error import BoardError
 
 class TestBoard(unittest.TestCase):
     def setUp(self):
-        self.board = Board()
+        self.board = Board(x_size=8, y_size=8)
 
     def test_surface(self):
         self.assertEqual(self.board.surface(1, 4), None)
@@ -90,7 +90,7 @@ class TestPlayer(unittest.TestCase):
         self.assertEqual(self.board.surface(2, 3), 'Black')
         self.player.putDisc(2, 3)
         self.assertEqual(self.disc10.count, 9)
-        self.player.putDisc(8, 3)
+        self.player.putDisc(10, 3)
         self.assertEqual(self.disc10.count, 9)
         self.empty_player.putDisc(2, 4)
         self.assertEqual(self.empty_disc.count, 0)
