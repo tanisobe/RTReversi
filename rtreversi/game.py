@@ -2,6 +2,7 @@
 # -*- coding=utf-8 -*-
 
 import threading
+import time
 import json
 from rtreversi.reversi import Player
 from rtreversi.reversi import Board
@@ -9,12 +10,13 @@ from rtreversi.reversi import Disc
 
 
 class Game():
-    def __init__(self, max_player=4):
+    def __init__(self, max_player=2):
         self.__players = dict()
         self.__board = Board()
         self.__max_player = max_player
         self.__lock = threading.Lock()
         self.DISC_COLORS = ['Black', 'White', 'Red', 'Blue', 'Yellow']
+        self.__timer = None
         self.wait = True
 
     @property
@@ -41,7 +43,10 @@ class Game():
                 self.wait = False
             return p
 
-    def refuse(self, handler):
+    def delete(self, handler):
+        if not self.wait:
+            self.__timer.stop()
+
         with self.__lock:
             try:
                 self.__players.pop(handler)
@@ -50,15 +55,31 @@ class Game():
                 pass
 
     def start(self):
+        self.__timer = GameTimer(self)
         with self.__lock:
             if not self.wait:
-                for player in self.__players:
-                    if not player.ready:
-                        return
+                print 'start timer'
+                self.__timer.start()
 
     def update(self):
         for handler in self.__players.keys():
-            handler.updateGame()
+            handler.sendCommand('updateGame', json.loads(self.toJson()))
+
+    def increaseDisc(self, x):
+        for player in self.__players.values():
+            player.disc.increase(x)
+            self.update()
+
+    def isOver(self):
+        if self.__board.isGameOver():
+            self.wait = True
+            return True
+        return False
+
+    def isFull(self):
+        if len(self.__players) >= self.__max_player:
+            return True
+        return False
 
 
 class GameManager():
@@ -73,14 +94,31 @@ class GameManager():
             self.games.append(game)
             return (player, game)
 
+    def deleteHandler(self, handler):
+        with self.__lock:
+            for game in self.games:
+                game.delete(handler)
+
     def introduce(self, handler):
         with self.__lock:
             for game in self.games:
-                if game.wait:
+                if game.wait and not game.isFull():
                     return (game.accept(handler), game)
             return self.create(handler)
 
-    def oust(self, handler):
-        with self.__lock:
-            for game in self.games:
-                game.refuse(handler)
+
+class GameTimer(threading.Thread):
+    def __init__(self, game):
+        threading.Thread.__init__(self)
+        self.__stop = threading.Event()
+        self.__game = game
+
+    def run(self):
+        while not self.__stop.isSet():
+            if self.__game.isOver():
+                return True
+            time.sleep(2.5)
+            self.__game.increaseDisc(1)
+
+    def stop(self):
+        self.__stop.set()

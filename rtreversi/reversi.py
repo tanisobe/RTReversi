@@ -10,6 +10,7 @@ class Board:
     def __init__(self, x_size=8, y_size=8):
         self.__surface = [[None for x in range(x_size)] for y in range(y_size)]
         self.__disc = {None: x_size * y_size}
+        self.__size = x_size * y_size
         self.__lock = threading.Lock()
 
     def surface(self, x, y):
@@ -86,19 +87,28 @@ class Board:
                     capture_pos.append((posX, posY))
                 (posX, posY) = plus(posX, posY, vec)
 
+    def isGameOver(self):
+        for color, num in self.__disc.items():
+            if color and 100.0 * num / self.__size > 50:
+                print 'game is over'
+                return True
+        return False
+
 
 class Disc:
-    def __init__(self, count=32):
+    def __init__(self, count=5, max=10):
         self.__count = count
+        self.__max = max
         self.__lock = threading.Lock()
 
     @property
     def count(self):
-        return self.__count
+        with self.__lock:
+            return self.__count
 
     def increase(self, x):
         with self.__lock:
-            if self.__count > 0:
+            if self.__max > self.__count:
                 self.__count += x
                 return True
             else:
@@ -118,7 +128,7 @@ class Player:
         self.__id = id
         self.__disc = disc
         self.__board = board
-        self.__ready = False
+        self.ready = False
         self.color = color
 
     def initialize(self, disc, board):
@@ -129,11 +139,15 @@ class Player:
     def id(self):
         return self.__id
 
+    @property
+    def disc(self):
+        return self.__disc
+
     def toJson(self):
         j = {
             'id': self.__id,
             'disc': self.__disc.count,
-            'ready': self.__ready,
+            'ready': self.ready,
             'color': self.color
         }
         return json.dumps(j)
