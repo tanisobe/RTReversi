@@ -7,6 +7,8 @@ import tornado.web
 import tornado.websocket
 import os
 import json
+import logging
+log = logging.getLogger(__name__)
 
 
 class RTReversiApp(tornado.web.Application):
@@ -31,20 +33,20 @@ class MainHandler(tornado.web.RequestHandler):
 
 class ReversiHandler(tornado.websocket.WebSocketHandler):
     def initialize(self):
-        print 'initialize'
+        log.debug('initialize')
         (self.player, self.game) = self.application.manager.introduce(self)
 
     def open(self):
-        print 'open connection'
+        log.debug('open connection')
         self.sendCommand('updateGame', json.loads(self.game.toJson()))
         self.game.start()
 
     def on_close(self):
-        print 'close connection'
+        log.debug('close connection')
         self.application.manager.deleteHandler(self)
 
     def on_message(self, msg):
-        print msg
+        log.debug(msg)
         m = json.loads(msg)
         commands = ['putDisc', 'removeDisc']
         if m['command'] in commands and not self.game.wait:

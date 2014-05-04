@@ -5,6 +5,8 @@ import threading
 import random
 import json
 from rtreversi.error import BoardError
+import logging
+log = logging.getLogger(__name__)
 
 
 class Board:
@@ -96,7 +98,7 @@ class Board:
     def isGameOver(self):
         for color, num in self.__disc.items():
             if color and 100.0 * num / self.__size > 50:
-                print 'game is over'
+                log.debug('game is over')
                 return True
         return False
 

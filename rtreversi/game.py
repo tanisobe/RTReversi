@@ -7,6 +7,8 @@ import json
 from rtreversi.reversi import Player
 from rtreversi.reversi import Board
 from rtreversi.reversi import Disc
+import logging
+log = logging.getLogger(__name__)
 
 
 class Game():
@@ -58,7 +60,7 @@ class Game():
         self.__timer = GameTimer(self)
         with self.__lock:
             if not self.wait:
-                print 'start timer'
+                log.debug('start timer')
                 self.__timer.start()
 
     def update(self):

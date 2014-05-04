@@ -3,7 +3,7 @@ RTReversi.Views.Communicator = Backbone.View.extend({
         _.bindAll(this, 'putDisc', 'removeDisc');
         RTReversi.EventDispatcher.on('putDisc', this.putDisc);
         RTReversi.EventDispatcher.on('removeDisc', this.removeDisc);
-        var url = 'ws://' + '192.168.0.3:5000' + '/reversi';
+        var url = 'ws://' + '192.168.0.7:5000' + '/reversi';
         this.socket = new WebSocket(url);
         this.socket.onmessage = this.onMessage;
     },
