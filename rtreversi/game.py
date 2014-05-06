@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 class Game():
-    def __init__(self, max_player=2):
+    def __init__(self, max_player=4):
         self.__players = dict()
         self.__board = Board()
         self.__max_player = max_player
@@ -57,14 +57,15 @@ class Game():
     def start(self):
         self.__timer = GameTimer(self)
         with self.__lock:
-            for  p in self.__players.values():
-                log.debug('start')
-                log.debug(p)
-                if not p.ready:
+            for  player in self.__players.values():
+                if not player.ready:
                     return
             self.wait = False
-            log.debug('start timer')
+            self.__board.initialize()
+            for player in self.__players.values():
+                player.initialize()
             self.__timer.start()
+            log.debug('start game')
 
     def update(self):
         for handler in self.__players.keys():
@@ -77,9 +78,9 @@ class Game():
 
     def isOver(self):
         if self.__board.isGameOver():
-            self.wait = True
             for  p in self.__players.values():
-                p.ready = True
+                p.ready = False
+            self.wait = True
             return True
         return False
 

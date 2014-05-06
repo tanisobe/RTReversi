@@ -14,7 +14,7 @@ class Board:
         self.initialize(x_size, y_size)
         self.__lock = threading.Lock()
 
-    def initialize(self, x_size, y_size):
+    def initialize(self, x_size=10, y_size=10):
         self.__surface = [[None for x in range(x_size)] for y in range(y_size)]
         for i in range(1, int(x_size * y_size * 0.05)):
             self.__surface[random.randint(0, x_size - 1)][random.randint(0, y_size - 1)] = 'Obstacle'
@@ -105,9 +105,12 @@ class Board:
 
 class Disc:
     def __init__(self, count=5, max=10):
+        self.initialize(count, max)
+        self.__lock = threading.Lock()
+
+    def initialize(self, count=5, max=10):
         self.__count = count
         self.__max = max
-        self.__lock = threading.Lock()
 
     @property
     def count(self):
@@ -139,9 +142,8 @@ class Player:
         self.ready = False
         self.color = color
 
-    def initialize(self, disc, board):
-        self.__disc = disc
-        self.__board = board
+    def initialize(self, disc=5):
+        self.__disc.initialize(5, 10)
 
     @property
     def id(self):
