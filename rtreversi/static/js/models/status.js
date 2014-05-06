@@ -1,10 +1,11 @@
 RTReversi.Models.Status = Backbone.Model.extend({
-    default: function () {
+    defaults: function () {
         return {
-            ready: false,
             id: '',
             color: '',
-            disc: ''
+            disc: '',
+            board_disc: 0,
+            ready: false
         };
     },
 

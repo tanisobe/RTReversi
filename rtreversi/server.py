@@ -39,7 +39,6 @@ class ReversiHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         log.debug('open connection')
         self.sendCommand('updateGame', json.loads(self.game.toJson()))
-        self.game.start()
 
     def on_close(self):
         log.debug('close connection')
@@ -48,14 +47,19 @@ class ReversiHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, msg):
         log.debug(msg)
         m = json.loads(msg)
-        commands = ['putDisc', 'removeDisc']
-        if m['command'] in commands and not self.game.wait:
+        setting_commands = ['changeStatus']
+        game_commands = ['putDisc', 'removeDisc']
+        if (m['command'] in setting_commands and self.game.wait) or (m['command'] in game_commands and not self.game.wait):
             method = getattr(self.player, m['command'])
+            log.debug(method)
             if method is not None:
                 if method(**m['param']):
                     self.game.update()
+                    log.debug(m['command'])
                     if self.game.isOver():
                         self.sendCommand('finish', json.loads(self.game.toJson()))
+                    if m['command'] in setting_commands:
+                        self.game.start()
 
     def sendCommand(self, command, param):
         j = {

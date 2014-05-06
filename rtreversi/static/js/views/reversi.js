@@ -5,8 +5,9 @@ RTReversi.Views.Reversi = Backbone.View.extend({
     },
 
     initialize: function () {
-        _.bindAll(this, 'render', 'renderBoard', 'renderDisc', 'renderDiscs', 'renderBoardStatus', 'initialize');
-        RTReversi.EventDispatcher.on('renderReversi', this.render);
+        _.bindAll(this, 'render', 'renderBoard', 'renderDisc', 'renderDiscs', 'renderBoardStatus', 'initialize', 'update');
+        RTReversi.EventDispatcher.on('updateReversi', this.update);
+        this.listenTo(this.model, 'change', this.render);
         var that = this;
         this.$el[0].addEventListener('mousemove',function(evt) {
             var rect = this.getBoundingClientRect();
@@ -16,6 +17,11 @@ RTReversi.Views.Reversi = Backbone.View.extend({
             });
         });
         this.ctx = this.$el[0].getContext('2d');
+        this.renderBoard();
+    },
+
+    update: function (param) {
+        this.model.set('board', param);
     },
 
     renderBoard: function () {
@@ -37,16 +43,15 @@ RTReversi.Views.Reversi = Backbone.View.extend({
         ctx.closePath();
     },
 
-    renderObstacle: function (x, y) {
-        console.log(x, y);
+    fillTile: function (x, y, color) {
         var ctx = this.$el[0].getContext('2d');
         ctx.beginPath();
-        ctx.fillStyle = 'Black';
+        ctx.fillStyle = color;
         ctx.fillRect(
-            this.model.get('x') + x * this.model.get('tileLength'),
-            this.model.get('y') + y * this.model.get('tileLength'),
-            this.model.get('tileLength'),
-            this.model.get('tileLength')
+            this.model.get('x') + x * this.model.get('tileLength') + 2 ,
+            this.model.get('y') + y * this.model.get('tileLength') + 2,
+            this.model.get('tileLength') - 4,
+            this.model.get('tileLength') - 4
         );
         ctx.stroke();
         ctx.closePath();
@@ -55,7 +60,7 @@ RTReversi.Views.Reversi = Backbone.View.extend({
     renderDisc: function (x, y, color) {
         if ( color ){
             if (color == 'Obstacle'){
-                this.renderObstacle(x, y);
+                this.fillTile(x, y, 'White');
             }else{
                 var ctx = this.$el[0].getContext('2d');
                 ctx.fillStyle = color;
@@ -71,21 +76,24 @@ RTReversi.Views.Reversi = Backbone.View.extend({
                 ctx.closePath();
             }
         }
+        else{
+            this.fillTile(x, y, 'Green');
+        }
     },
 
-    renderDiscs: function (param) {
+    renderDiscs: function () {
         for ( var x = 0; x < this.model.get('size'); x++){
             for ( var y = 0; y < this.model.get('size'); y++){
-                this.renderDisc(x, y, param[x][y]);
+                this.renderDisc(x, y, this.model.get('board')['surface'][x][y]);
             }
         }
     },
 
-    renderBoardStatus: function (param) {
+    renderBoardStatus: function () {
         var i = 1;
-        var size = ( parseInt(this.$el[0].width) - 20 ) / ( Object.keys(param).length + 1 );
+        var size = ( parseInt(this.$el[0].width) - 20 ) / ( Object.keys(this.model.get('board')['disc']).length + 1 );
         var ctx = this.$el[0].getContext('2d');
-        $.each( param, function( color, count ) {
+        $.each( this.model.get('board')['disc'], function( color, count ) {
             if ( color != 'null') {
                 ctx.font = '30px Arial';
                 ctx.fillStyle = 'black';
@@ -95,10 +103,8 @@ RTReversi.Views.Reversi = Backbone.View.extend({
         });
     },
 
-    render: function (param) {
-        this.renderBoard();
-        this.renderDiscs(param.surface);
-        this.renderBoardStatus(param.disc);
+    render: function () {
+        this.renderDiscs();
     },
 
     getBoardPos: function () {

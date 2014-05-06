@@ -3,7 +3,7 @@ RTReversi.Views.StatusCollection = Backbone.View.extend({
 
     initialize: function () {
         _.bindAll(this, 'update', 'render');
-        RTReversi.EventDispatcher.on('renderPlayerStatus', this.update);
+        RTReversi.EventDispatcher.on('updatePlayerStatus', this.update);
         this.listenTo(this.collection, 'add', this.render);
         this.listenTo(this.collection, 'change', this.render);
         this.listenTo(this.collection, 'delete', this.render);

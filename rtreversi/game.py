@@ -41,8 +41,6 @@ class Game():
         with self.__lock:
             p = Player(len(self.__players), self.DISC_COLORS[len(self.__players)], Disc(), self.__board)
             self.__players[handler] = p
-            if len(self.__players) == self.__max_player:
-                self.wait = False
             return p
 
     def delete(self, handler):
@@ -59,9 +57,14 @@ class Game():
     def start(self):
         self.__timer = GameTimer(self)
         with self.__lock:
-            if not self.wait:
-                log.debug('start timer')
-                self.__timer.start()
+            for  p in self.__players.values():
+                log.debug('start')
+                log.debug(p)
+                if not p.ready:
+                    return
+            self.wait = False
+            log.debug('start timer')
+            self.__timer.start()
 
     def update(self):
         for handler in self.__players.keys():
@@ -75,6 +78,8 @@ class Game():
     def isOver(self):
         if self.__board.isGameOver():
             self.wait = True
+            for  p in self.__players.values():
+                p.ready = True
             return True
         return False
 

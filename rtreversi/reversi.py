@@ -177,3 +177,10 @@ class Player:
             except BoardError:
                 self.__disc.increase(5)
                 return False
+
+    def changeStatus(self, ready, color, disc, id, board_disc):
+        if self.__id == id:
+            log.debug(ready)
+            self.ready = ready
+            self.color = color
+            return True
